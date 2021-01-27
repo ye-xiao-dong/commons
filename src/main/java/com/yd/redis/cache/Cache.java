@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Cache {
 
-    // 缓存key
+    // 缓存key，SpEL表达式
     String key();
 
     // 缓存最长时间
@@ -28,7 +28,7 @@ public @interface Cache {
     // 更新数据之后刷新缓存
     boolean refreshCache() default true;
 
-    // hash key，使用map类型的时候用上
+    // hash key，使用map类型的时候用上，SpEL表达式
     String hashKey() default "";
 
 }
