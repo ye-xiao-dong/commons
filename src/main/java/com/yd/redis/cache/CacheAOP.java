@@ -39,22 +39,31 @@ public class CacheAOP {
     }
 
     /**
-     * 切入点
+     * 单个注解的切入点
      *
      */
     @Pointcut("@annotation(Cache)")
-    public void pointCut() {
-        // 这里直接切入
+    public void pointCutCache() {
+        // 切入点
     }
 
     /**
-     * 环绕方法
+     * 多个注解的切入点
+     *
+     */
+    @Pointcut("@annotation(Caches)")
+    public void pointCutCaches() {
+        // 切入点
+    }
+
+    /**
+     * 单个注解的环绕方法
      *
      * @param joinPoint
      * @param cache
      */
-    @Around("pointCut() && @annotation(cache)")
-    public Object around(ProceedingJoinPoint joinPoint, Cache cache) {
+    @Around("pointCutCache() && @annotation(cache)")
+    public Object aroundCache(ProceedingJoinPoint joinPoint, Cache cache) {
         try {
             Object result = null;
 
@@ -77,6 +86,49 @@ public class CacheAOP {
             // 这里判断是否要刷新缓存
             if (cache.refreshCache() && result != null){
                 refreshCache(key, cache.redisType(), hashKey, cache.cacheTime(), result);
+            }
+
+            return result;
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    /**
+     * 多个注解的环绕方法
+     *
+     * @param joinPoint
+     * @param caches
+     */
+    @Around("pointCutCaches() && @annotation(caches)")
+    public Object aroundCaches(ProceedingJoinPoint joinPoint, Caches caches) {
+        try {
+            Object result = null;
+            Map<String, Object> variables = getVariables(joinPoint);
+
+            // 先读能读的所有缓存
+            for (Cache cache : caches.value()){
+                if (cache.readCache()){
+                    String key = formatKey(cache.key(), variables);
+                    String hashKey = formatKey(cache.hashKey(), variables);
+                    result = readCache(key, cache.redisType(), hashKey);
+                    if (result != null){
+                        return result;
+                    }
+                }
+            }
+
+            result = joinPoint.proceed();
+
+            // 这里判断是否要刷新缓存，要刷新所有可以刷新的缓存
+            if (result != null){
+                for (Cache cache : caches.value()){
+                    if (cache.refreshCache()){
+                        String key = formatKey(cache.key(), variables);
+                        String hashKey = formatKey(cache.hashKey(), variables);
+                        refreshCache(key, cache.redisType(), hashKey, cache.cacheTime(), result);
+                    }
+                }
             }
 
             return result;

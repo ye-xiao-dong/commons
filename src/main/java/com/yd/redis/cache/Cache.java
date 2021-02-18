@@ -1,9 +1,6 @@
 package com.yd.redis.cache;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author： 叶小东
@@ -11,16 +8,17 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(Caches.class)
 public @interface Cache {
 
     // 缓存key，SpEL表达式
     String key();
 
-    // 缓存最长时间
-    long cacheTime();
-
     // redis 操作类型
     RedisType redisType();
+
+    // 缓存最长时间，毫秒
+    long cacheTime() default 1;
 
     // 获取数据之前读缓存
     boolean readCache() default true;
