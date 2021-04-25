@@ -1,6 +1,6 @@
 # apollo
 
-### 此分支为 基于Spring Cloud 和 Apollo 框架的动态刷新配置
+### 此分支为 基于 Spring Cloud 和 Apollo 框架的动态刷新配置
 
 	
 1、使用时需要在启动类上加上 @EnableApolloConfig 注解，并配置好对应
