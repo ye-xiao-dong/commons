@@ -33,11 +33,29 @@ public class RedisUtil {
      * @param redisTemplate
      * @param key
      */
-    public static void delete(RedisTemplate redisTemplate, String key) {
+    public static void delete(RedisTemplate redisTemplate, Object key) {
         try {
             redisTemplate.delete(key);
         }catch (Exception e){
             log.error("redis【delete】操作异常，异常信息：{}", JSON.toJSONString(e));
+        }
+    }
+
+    /**
+     * redis的删除，会比较值相同才删除
+     *
+     * @param redisTemplate
+     * @param key
+     * @param value
+     */
+    public static void deleteByKeyValue(RedisTemplate redisTemplate, Object key, Object value) {
+        try {
+            Object o = get(redisTemplate, key);
+            if (o != null && o.equals(value)){
+                delete(redisTemplate, key);
+            }
+        }catch (Exception e){
+            log.error("redis【deleteByKeyValue】操作异常，异常信息：{}", JSON.toJSONString(e));
         }
     }
 
@@ -47,7 +65,7 @@ public class RedisUtil {
      * @param redisTemplate
      * @param key
      */
-    public static boolean hasKey(RedisTemplate redisTemplate, String key) {
+    public static boolean hasKey(RedisTemplate redisTemplate, Object key) {
         try {
             return redisTemplate.hasKey(key);
         }catch (Exception e){
@@ -130,15 +148,16 @@ public class RedisUtil {
      *
      * @param redisTemplate
      * @param key
+     * @param value
      * @param millisecond
      * @param waitingTime
      * @return
      */
-    public static boolean getLock(RedisTemplate redisTemplate, String key, long millisecond, long waitingTime){
+    public static boolean getLock(RedisTemplate redisTemplate, String key, String value, long millisecond, long waitingTime){
         try {
             long timeMillis = System.currentTimeMillis();
             do {
-                Boolean lock = redisTemplate.opsForValue().setIfAbsent(key, "lock", millisecond, TimeUnit.MILLISECONDS);
+                Boolean lock = redisTemplate.opsForValue().setIfAbsent(key, value, millisecond, TimeUnit.MILLISECONDS);
                 if (lock != null && lock){
                     return true;
                 }

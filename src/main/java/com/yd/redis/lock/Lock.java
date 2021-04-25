@@ -16,6 +16,9 @@ public @interface Lock {
     // 锁名
     String lockName();
 
+    // 锁值
+    String lockValue() default "lock";
+
     // 获取锁的最长等待时间
     long waitingTime();
 

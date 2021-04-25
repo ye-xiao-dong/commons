@@ -52,7 +52,7 @@ public class LockAOP {
             Object result = null;
 
             // 这里先获取分布式锁
-            if (RedisUtil.getLock(redisTemplate, lockName, lock.lockingTime(), lock.waitingTime())){
+            if (RedisUtil.getLock(redisTemplate, lockName, lock.lockValue(), lock.lockingTime(), lock.waitingTime())){
                 result = joinPoint.proceed();
             }
             else {
@@ -75,7 +75,7 @@ public class LockAOP {
         } catch (Throwable throwable) {
             throw new RuntimeException(throwable);
         } finally {
-            RedisUtil.delete(redisTemplate, lockName);
+            RedisUtil.deleteByKeyValue(redisTemplate, lockName, lock.lockValue());
         }
     }
 }
