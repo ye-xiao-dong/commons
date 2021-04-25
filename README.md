@@ -1,6 +1,6 @@
 # redis
 
-### 此分支为 基于springboot实现的 redis相关工具类
+### 此分支为 基于 Spring Boot 实现的 Redis 相关工具类
 
 	
 1、当 @Cache 注解和 @Lock 注解都在同一个方法上时，会先执行 @Cache的
