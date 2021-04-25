@@ -1,6 +1,6 @@
 # druid
 
-### 此分支为 基于springboot实现的 druid相关数据源配置
+### 此分支为 基于 Spring Boot 实现的 Druid 相关数据源配置
 
 #### 解释说明
 
