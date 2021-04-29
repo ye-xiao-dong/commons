@@ -8,10 +8,10 @@ import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import com.yd.elasticjob.annotation.Param;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 /**
  * @author： 叶小东
@@ -28,38 +28,34 @@ public class Job implements SimpleJob {
     @Override
     public void execute(ShardingContext shardingContext) {
         if (method != null && bean != null){
-
             Object[] params = null;
             if (method.getParameterCount() > 0){
-
                 JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(shardingContext));
-                Class<?>[] parameterTypes = method.getParameterTypes();
-                Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-                String[] parameterNames = new LocalVariableTableParameterNameDiscoverer().getParameterNames(method);
-                params = new Object[parameterTypes.length];
-                for(int i = 0, j = parameterTypes.length; i < j; i++) {
-                    String name = parameterTypes[i].getName();
-                    if (name.contains(".")){
-                        name = name.substring(name.lastIndexOf(".") + 1);
+                Parameter[] parameters = method.getParameters();
+                params = new Object[parameters.length];
+                for(int i = 0, j = parameters.length; i < j; i++) {
+                    String typeName = parameters[i].getType().getName();
+                    if (typeName.contains(".")){
+                        typeName = typeName.substring(typeName.lastIndexOf(".") + 1);
                     }
 
-                    if ("ShardingContext".equals(name)){
+                    if ("ShardingContext".equals(typeName)){
                         params[i] = shardingContext;
                     }
                     else {
 
-                        String key = null;
-
                         // 先找到这个参数上的注解的名字
-                        for (Annotation annotation : parameterAnnotations[i]) {
+                        String key = null;
+                        for (Annotation annotation : parameters[i].getAnnotations()) {
                             if (Param.class.equals(annotation.annotationType())) {
                                 key = ((Param) annotation).value();
+                                break;
                             }
                         }
 
                         // 如果没有注解，直接取参数名称
                         if (key == null) {
-                            key = parameterNames[i];
+                            key = parameters[i].getName();
                         }
 
                         if (key != null) {
