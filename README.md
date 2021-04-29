@@ -1,6 +1,6 @@
 # elasticjob
 
-### 此分支为 基于Spring 和 ElasticJob 框架实现的分布式定时任务组件
+### 此分支为 基于 Spring 和 ElasticJob 框架实现的分布式定时任务组件
 
 	
 1、使用时需要在启动类上加上 @EnableElasticJob 注解
