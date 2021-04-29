@@ -68,7 +68,7 @@ public class Job implements SimpleJob {
             // 执行方法
             try {
                 long beginTime = System.currentTimeMillis();
-                log.info("===>{} JOB BEGIN TIME: {} <===", shardingContext.getJobName(), DateTime.now().toString());
+                log.info("===>{}, JOB BEGIN TIME: {} <===", shardingContext.getJobName(), DateTime.now().toString());
                 method.invoke(bean, params);
                 log.info("===>{}, JOB END TIME: {},TOTAL CAST: {} <===", shardingContext.getJobName(),
                         DateTime.now().toString(), System.currentTimeMillis() - beginTime);
