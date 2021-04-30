@@ -48,4 +48,7 @@ public @interface Scheduled{
 
     // 定时任务分片策略
     Class<?> jobShardingStrategyClass() default Void.class;
+
+    // 指定环境，指定该任务只有在指定环境生效，默认不限制
+    String[] envs() default {};
 }

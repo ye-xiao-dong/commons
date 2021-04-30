@@ -1,5 +1,6 @@
 package com.yd.elasticjob;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
 import com.dangdang.ddframe.job.config.JobCoreConfiguration;
 import com.dangdang.ddframe.job.config.simple.SimpleJobConfiguration;
@@ -44,6 +45,10 @@ public class ScheduledConfig {
     @Value("${spring.application.name}")
     private String namespace;
 
+    /**
+     * 初始化配置
+     *
+     */
     @PostConstruct
     public synchronized void initElasticJob() {
 
@@ -112,9 +117,16 @@ public class ScheduledConfig {
         }
     }
 
+    /**
+     * 获取带有Scheduled注解的方法，并进行job注册
+     *
+     * @param beanNames
+     * @return
+     */
     private Map<String, Map<SimpleJob, Scheduled>> getSimpleJobMap(String[] beanNames) {
         Map<String, Map<SimpleJob, Scheduled>> result = new HashMap();
         if (beanNames != null) {
+            String env = applicationContext.getEnvironment().getActiveProfiles()[0];
             for (String beanName : beanNames) {
 
                 // 先获取这个类里面有Scheduled注解的方法
@@ -125,8 +137,11 @@ public class ScheduledConfig {
 
                     // 对于每一个定时方法创建一个Job
                     for (Method method : scheduleMethodMap.keySet()) {
-                        List<Scheduled> scheduleds = new ArrayList(scheduleMethodMap.get(method));
-                        for (Scheduled scheduled : scheduleds) {
+                        for (Scheduled scheduled : scheduleMethodMap.get(method)) {
+                            if (ArrayUtil.isNotEmpty(scheduled.envs()) && !ArrayUtil.contains(scheduled.envs(), env)){
+                                continue;
+                            }
+
                             String name = bean.getClass().getName() + "_" + suffix;
                             registerAJob(name, bean, method);
                             Job job = (Job) applicationContext.getBean(name);
@@ -143,6 +158,12 @@ public class ScheduledConfig {
         return result;
     }
 
+    /**
+     * 获取具有Scheduled注解的所有方法
+     *
+     * @param bean
+     * @return
+     */
     private Map<Method, Set<Scheduled>> getScheduleMethod(Object bean) {
         Map<Method, Set<Scheduled>> result = new HashMap();
         if (bean instanceof AopInfrastructureBean) {
@@ -159,6 +180,13 @@ public class ScheduledConfig {
         return result;
     }
 
+    /**
+     * 注册一个job
+     *
+     * @param beanName
+     * @param bean
+     * @param method
+     */
     private synchronized void registerAJob (String beanName, Object bean, Method method){
         ConfigurableApplicationContext context = (ConfigurableApplicationContext) this.applicationContext;
         DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) context.getBeanFactory();
