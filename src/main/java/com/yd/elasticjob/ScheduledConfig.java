@@ -143,7 +143,7 @@ public class ScheduledConfig {
                             }
 
                             String name = bean.getClass().getName() + "_" + suffix;
-                            registerAJob(name, bean, method);
+                            registerAJob(name, bean, method, scheduled);
                             Job job = (Job) applicationContext.getBean(name);
                             String methodName = bean.getClass().getName() + "_" + method.getName() + "_" + suffix;
                             result.putIfAbsent(methodName, new HashMap());
@@ -186,13 +186,15 @@ public class ScheduledConfig {
      * @param beanName
      * @param bean
      * @param method
+     * @param scheduled
      */
-    private synchronized void registerAJob (String beanName, Object bean, Method method){
+    private synchronized void registerAJob (String beanName, Object bean, Method method, Scheduled scheduled){
         ConfigurableApplicationContext context = (ConfigurableApplicationContext) this.applicationContext;
         DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) context.getBeanFactory();
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(Job.class);
         beanDefinitionBuilder.addPropertyValue("method", method);
         beanDefinitionBuilder.addPropertyValue("bean", bean);
+        beanDefinitionBuilder.addPropertyValue("scheduled", scheduled);
         beanFactory.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
     }
 }

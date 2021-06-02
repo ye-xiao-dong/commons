@@ -41,7 +41,7 @@ public @interface Scheduled{
     boolean overwrite() default true;
 
     //是否开启失效转移，仅monitorExecution开启时才起作用
-    boolean failover() default true;
+    boolean failover() default false;
 
     //监控作业执行时状态
     boolean monitorExecution() default true;
@@ -51,4 +51,10 @@ public @interface Scheduled{
 
     // 指定环境，指定该任务只有在指定环境生效，默认不限制
     String[] envs() default {};
+
+    // 自动进行日志记录，默认开启
+    boolean autoLog() default true;
+
+    // 进行执行时间二次判断
+    boolean recheckTime() default true;
 }
