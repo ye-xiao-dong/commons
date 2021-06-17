@@ -1,6 +1,7 @@
 package com.yd.elasticjob;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dangdang.ddframe.job.api.ShardingContext;
@@ -38,7 +39,13 @@ public class Job implements SimpleJob {
 
         // 判断执行时间二次校验
         if (scheduled.recheckTime() && !MyUtil.isRunTime(now, scheduled.cron())){
-            return;
+
+            // 到这里相当于是 需要进行时间的二次校验，且当前时间不符合cron表达式，认为是当前时间比正常执行时间延迟了
+            Date lastExecutionTime = MyUtil.getTimeBefore(now, scheduled.cron());
+            if (lastExecutionTime == null ||
+                    DateUtil.between(lastExecutionTime, now, scheduled.timeUnit()) > scheduled.allowRange()) {
+                return;
+            }
         }
 
         Object[] params = null;

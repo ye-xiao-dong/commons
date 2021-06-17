@@ -1,5 +1,7 @@
 package com.yd.elasticjob.annotation;
 
+import cn.hutool.core.date.DateUnit;
+
 import java.lang.annotation.*;
 
 /**
@@ -57,4 +59,10 @@ public @interface Scheduled{
 
     // 进行执行时间二次判断
     boolean recheckTime() default true;
+
+    // 二次判断允许延迟的时间误差范围，仅在recheckTime为true的时候有效
+    int allowRange() default 1;
+
+    // 二次判断允许延迟的时间误差范围单位，仅在recheckTime为true的时候有效
+    DateUnit timeUnit() default DateUnit.SECOND;
 }
