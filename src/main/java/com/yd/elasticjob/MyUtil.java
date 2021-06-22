@@ -39,24 +39,4 @@ public class MyUtil {
             return null;
         }
     }
-
-    /**
-     * 判断指定时间之前的上一次符合cron表达式的执行时间
-     *
-     * @param date
-     * @param cron
-     * @return
-     */
-    public static Date getTimeBefore(Date date, String cron){
-        try {
-            CronExpression cronExpression = new CronExpression(cron);
-            Date time1 = cronExpression.getTimeAfter(date);
-            Date time2 = cronExpression.getTimeAfter(time1);
-            Date time3 = cronExpression.getTimeAfter(time2);
-            long l = time1.getTime() - (time3.getTime() - time2.getTime());
-            return new Date(l);
-        } catch (Exception e){
-            return null;
-        }
-    }
 }

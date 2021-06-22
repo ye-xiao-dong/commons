@@ -41,9 +41,9 @@ public class Job implements SimpleJob {
         if (scheduled.recheckTime() && !MyUtil.isRunTime(now, scheduled.cron())){
 
             // 到这里相当于是 需要进行时间的二次校验，且当前时间不符合cron表达式，认为是当前时间比正常执行时间延迟了
-            Date lastExecutionTime = MyUtil.getTimeBefore(now, scheduled.cron());
-            if (lastExecutionTime == null ||
-                    DateUtil.between(lastExecutionTime, now, scheduled.timeUnit()) > scheduled.allowRange()) {
+            Date startTime = DateUtil.offset(now, scheduled.timeUnit(), -scheduled.allowRange());
+            Date executionTime = MyUtil.getTimeAfter(startTime, scheduled.cron());
+            if (executionTime == null || executionTime.after(now)) {
                 return;
             }
         }
