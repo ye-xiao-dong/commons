@@ -9,4 +9,4 @@
 
 * apollo分支：基于 Spring Cloud 和 Apollo 框架的动态刷新配置
 
-* generator分支：基于FreeMarker的自动代码生成器
+* generator分支：基于FreeMarker的自动代码生成器（未上传）
