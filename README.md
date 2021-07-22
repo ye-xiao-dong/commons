@@ -8,3 +8,5 @@
 * elasticjob分支：基于 Spring 和 ElasticJob 框架实现的分布式定时任务组件
 
 * apollo分支：基于 Spring Cloud 和 Apollo 框架的动态刷新配置
+
+* generator分支：基于FreeMarker的自动代码生成器
